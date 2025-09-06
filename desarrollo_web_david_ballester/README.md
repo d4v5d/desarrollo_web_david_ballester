@@ -1,3 +1,4 @@
 # desarrollo_web_david_ballester
 
-pass
+Hice documentación con ChatGPT para que fuera más claro y compacto.
+
