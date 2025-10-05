@@ -91,6 +91,7 @@ button:hover {
     height: 400px;
     width: 640px;
 }
+/* Modal para agrandar imágenes */
 .modal {
     display: none;
     position: fixed;
@@ -107,9 +108,9 @@ button:hover {
 .modal-content {
     margin: auto;
     display: block;
-    width: 800px;
-    height: 600px;
-    object-fit: contain;
+    width: 800px !important;
+    height: 600px !important;
+    object-fit: cover;  
     border-radius: 8px;
 }
 
@@ -131,7 +132,7 @@ button:hover {
     text-decoration: none;
 }
 
-
+/* Cursor pointer para imágenes clicables */
 #tabla-interactiva img {
     cursor: pointer;
     transition: transform 0.2s ease;
