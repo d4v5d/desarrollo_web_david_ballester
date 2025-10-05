@@ -79,6 +79,18 @@ const validateFecha = (date, act) => {
     return newDate > act;
 };
 
+const validateContactos = (form) => {
+    const inputsContacto = document.querySelectorAll('#inputs-contacto input[type="text"]');
+    if (inputsContacto.length === 0) return false; // Debe haber al menos un contacto
+    
+    for (let input of inputsContacto) {
+        if (!validateText(input.value, 4, 50)) {
+            return false;
+        }
+    }
+    return true;
+};
+
 // Ajuste de fecha actual para validación (con margen de minutos)
 let now = new Date();
 now.setHours(now.getHours() + 3);
@@ -127,6 +139,7 @@ const validateForm = () => {
     if (!validateText(name, 3, 200)) setInvalidInput("Nombre");
     if (!validateEmail(email)) setInvalidInput("Email");
     if (!validatePhoneNumber(phoneNumber)) setInvalidInput("Número de teléfono");
+    if (!validateContactos(myForm)) setInvalidInput("Formas de contacto");
 
     // Mascota
     if (!validateSelect(tipo)) setInvalidInput("Tipo de Mascota");

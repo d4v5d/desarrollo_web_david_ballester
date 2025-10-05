@@ -1,11 +1,6 @@
 // Objeto que contiene todas las regiones de Chile como claves,
 // y dentro de cada una un arreglo con sus comunas correspondientes.
-const regiones_comunas = {
-    "1 - Región de Tarapacá": ["Camiña", "Huara", "Pozo Almonte", "Iquique", "Pica", "Colchane", "Alto Hospicio"],
-    "2 - Región de Antofagasta": ["Tocopilla", "Maria Elena", "Ollague", "Calama", "San Pedro Atacama", "Sierra Gorda", "Mejillones", "Antofagasta", "Taltal"],
-    // ... (se repite la misma lógica para todas las regiones)
-    "16 - Región del Ñuble": ["Cobquecura", "Ñiquen", "San Fabian", "San Carlos", "Quirihue", "Ninhue", "Trehuaco", "San Nicolas", "Coihueco", "Chillan", "Portezuelo", "Pinto", "Coelemu", "Bulnes", "San Ignacio", "Ranquil", "Quillon", "El Carmen", "Pemuco", "Yungay", "Chillan Viejo"]
-};
+const regiones_comunas = region_comuna
 
 // Listas auxiliares para poblar selects
 const tipo_mascota = ["Gato", "Perro"];
