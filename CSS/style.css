@@ -91,3 +91,52 @@ button:hover {
     height: 400px;
     width: 640px;
 }
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    padding-top: 50px;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.9);
+}
+
+.modal-content {
+    margin: auto;
+    display: block;
+    width: 800px;
+    height: 600px;
+    object-fit: contain;
+    border-radius: 8px;
+}
+
+.close {
+    position: absolute;
+    top: 15px;
+    right: 35px;
+    color: #f1f1f1;
+    font-size: 40px;
+    font-weight: bold;
+    transition: 0.3s;
+    cursor: pointer;
+    z-index: 1001;
+}
+
+.close:hover,
+.close:focus {
+    color: #bbb;
+    text-decoration: none;
+}
+
+
+#tabla-interactiva img {
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+#tabla-interactiva img:hover {
+    transform: scale(1.05);
+}
