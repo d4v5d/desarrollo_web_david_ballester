@@ -5,7 +5,7 @@ from werkzeug.utils import secure_filename
 import filetype
 import os
 
-UPLOAD_FOLDER = 'static/IMG'
+UPLOAD_FOLDER = 'static/uploads/'
 
 app = Flask(__name__)
 
