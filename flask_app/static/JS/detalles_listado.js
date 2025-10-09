@@ -1,9 +1,13 @@
 let portada = document.getElementById("info-portada");
-portada.addEventListener("click", () => {
-            window.location.href = "../HTML/portada.html"
-        });
+if (portada) {
+    portada.addEventListener("click", () => {
+        window.location.href = "/";
+    });
+}
 
 let tabla = document.getElementById("info-tabla");
-tabla.addEventListener("click", () => {
-            window.location.href = "../HTML/listado.html"
-        });
+if (tabla) {
+    tabla.addEventListener("click", () => {
+        window.location.href = "/listado";
+    });
+}

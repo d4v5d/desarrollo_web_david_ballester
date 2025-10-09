@@ -1,44 +1,77 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-	<title>Juan</title>
-    <link rel="stylesheet" type="text/css" href="../CSS/style.css">
-</head>
-<body>
-    <div class="detalle-box">
-        <h2>Juan</h2>
-        <img id="Juan" src="../IMG/labradorcito.webp" alt="Juan">
-        <ul>
-            <li>Tipo: Perro</li>
-            <li>Edad: 5 meses</li>
-            <li>Cantidad: 1</li>
-            <li>Descripcion: Cachorro Labrador retriever color crema. Muy cariñoso y tranquilo, le gusta estar acompañado y jugar con pelotas. Ideal para familias con niños o personas activas que puedan dedicarle tiempo. Tiene sus primeras vacunas al día y está acostumbrado a convivir con otros perros.</li>
-            <li>Ubicación: Ñuñoa, Región Metropolitana de Santiago</li>
-        </ul>
-        <br>
-        <h3>Contacto:</h3>
-        <ul>
-            <li>Nombre: Camila Torres</li>
-            <li>Instagram: @CamilaAdopta</li>
-            <li>Telegram: @CamilaDogs</li>
-            <li>Teléfono: +569 78563412</li>
-            <li>Correo: camila.torres@mail.cl</li>
-        </ul>
-        <br>
-        <h3>Fecha</h3>
-        <ul>
-            <li>Publicación: 2025-09-05 12:30</li>
-            <li>Retiro desde: 2025-09-06 10:00</li>
-        </ul>
-        <br>
-        <h3>Fotos: </h3>
+{% extends "base.html" %}
 
-        <img id="Juan_1" src="../IMG/labradorcito.webp" alt="Juan1">
-        <img id="Juan_2" src="../IMG/labradorcito2.webp" alt="Juan2">
-        <button id="info-tabla">Volver al listado</button>
-        <button id="info-portada">Volver a la portada</button>
-    </div>
+{% block title %}Detalles - Portal de Adopciones{% endblock %}
+
+{% block content %}
+<div class="detalle-box">
+    <h2>Detalles del Aviso</h2>
+    <img id="foto-principal" 
+         src="{{ url_for('static', filename='uploads/' + aviso['foto_principal']) }}" 
+         alt="{{ aviso['tipo'] }}">
     
-    <script src="../JS/detalles_listado.js"></script>
-</body>
-</html>
+    <ul>
+        <li><strong>Tipo:</strong> {{ aviso['tipo']|title }}</li>
+        <li><strong>Edad:</strong> {{ aviso['edad_formato'] }}</li>
+        <li><strong>Cantidad:</strong> {{ aviso['cantidad'] }}</li>
+        <li><strong>Descripcion:</strong> {{ aviso['descripcion'] }}</li>
+        <li><strong>Ubicación:</strong> {{ aviso['sector'] }}, {{ aviso['comuna'] }}, {{ aviso['region'] }}</li>
+    </ul>
+    <br>
+    
+    <h3>Contacto:</h3>
+    <ul>
+        <li><strong>Nombre:</strong> {{ aviso['contacto']['nombre'] }}</li>
+        {% if aviso['contacto']['instagram'] %}
+            <li><strong>Instagram:</strong> {{ aviso['contacto']['instagram'] }}</li>
+        {% endif %}
+        {% if aviso['contacto']['telegram'] %}
+            <li><strong>Telegram:</strong> {{ aviso['contacto']['telegram'] }}</li>
+        {% endif %}
+        {% if aviso['contacto']['whatsapp'] %}
+            <li><strong>WhatsApp:</strong> {{ aviso['contacto']['whatsapp'] }}</li>
+        {% endif %}
+        {% if aviso['contacto']['x'] %}
+            <li><strong>X:</strong> {{ aviso['contacto']['x'] }}</li>
+        {% endif %}
+        {% if aviso['contacto']['tiktok'] %}
+            <li><strong>TikTok:</strong> {{ aviso['contacto']['tiktok'] }}</li>
+        {% endif %}
+        {% if aviso['contacto']['telefono'] %}
+            <li><strong>Teléfono:</strong> {{ aviso['contacto']['telefono'] }}</li>
+        {% endif %}
+        {% if aviso['contacto']['correo'] %}
+            <li><strong>Correo:</strong> {{ aviso['contacto']['correo'] }}</li>
+        {% endif %}
+    </ul>
+    <br>
+    
+    <h3>Fecha</h3>
+    <ul>
+        <li><strong>Publicación:</strong> {{ aviso['fecha_publicacion'] }}</li>
+        <li><strong>Retiro desde:</strong> {{ aviso['fecha_entrega_formato'] }}</li>
+    </ul>
+    <br>
+    
+    {% if aviso['fotos']|length > 1 %}
+    <h3>Fotos: </h3>
+    {% for foto in aviso['fotos'] %}
+        <img id="foto_{{ loop.index }}" 
+             src="{{ url_for('static', filename='uploads/' + foto) }}" 
+             alt="Foto {{ loop.index }}"
+             style="max-width: 300px; margin: 10px;">
+    {% endfor %}
+    {% endif %}
+    
+    <br>
+    <button id="info-tabla">
+        Volver al listado
+    </button>
+    <button id="info-portada">
+        Volver a la portada
+    </button>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='JS/detalles_listado.js') }}"></script>
+{% endblock %}

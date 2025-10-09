@@ -8,9 +8,11 @@
     
     {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
-            <div id="val-box">
+            <div class="flash-messages">
                 {% for category, message in messages %}
-                    <h2 class="{{ category }}">{{ message }}</h2>
+                    <div class="alert alert-{{ category }}">
+                        {{ message }}
+                    </div>
                 {% endfor %}
             </div>
         {% endif %}
@@ -22,7 +24,6 @@
     </div>
     
     <form name="myForm" method="POST" action="{{ url_for('crear_aviso') }}" enctype="multipart/form-data">
-        {{ form.csrf_token }}
         
         <div class="donde">
             <h2>Dónde? </h2>
@@ -36,24 +37,24 @@
             </select><br>
 
             <label for="select-comuna">Comuna</label>
-            <select name="select-comuna" id="select-comuna">
+            <select name="select-comuna" id="select-comuna" required>
                 <option value="">Seleccione una comuna</option>
             </select><br>
 
             <label for="sector">Sector </label>
-            <input type="text" name="sector" id="sector" maxlength="100"><br><br>
+            <input type="text" name="sector" id="sector" maxlength="100" placeholder="Ej: San Carlos de Apoquindo"><br><br>
         </div>
 
         <div class="contacto">
             <h2>Información de contacto</h2>
             <label for="nombre">Nombre</label>
-            <input type="text" name="nombre" id="nombre" required><br>
+            <input type="text" name="nombre" id="nombre" required placeholder="Tu nombre completo"><br>
 
             <label for="email">Email</label>
-            <input type="email" name="email" id="email" required><br>
+            <input type="email" name="email" id="email" required placeholder="correo@ejemplo.com"><br>
 
             <label for="phone">Teléfono</label>
-            <input type="tel" name="phone" id="phone" required><br>
+            <input type="tel" name="phone" id="phone" placeholder="+569 12345678"><br>
 
             <label for="select-contacto">Contactar por <br> (Seleccione con Ctrl) </label>
             <select name="select-contacto" id="select-contacto" multiple size="5">
@@ -74,30 +75,28 @@
             <label for="select-tipo">Tipo de Mascota </label>
             <select name="select-tipo" id="select-tipo" required>
                 <option value="">Seleccione</option>
-                {% for tipo in tipos_mascota %}
-                    <option value="{{ tipo }}">{{ tipo }}</option>
-                {% endfor %}
+                <option value="perro">Perro</option>
+                <option value="gato">Gato</option>
             </select><br>
 
             <label for="cantidad">Cantidad </label>
-            <input type="number" name="cantidad" id="cantidad" min="1" required><br>
+            <input type="number" name="cantidad" id="cantidad" min="1" max="99" required placeholder="1"><br>
 
             <label for="edad">Edad </label>
-            <input type="number" name="edad" id="edad" min="0" required><br>
+            <input type="number" name="edad" id="edad" min="0" max="100" required placeholder="6"><br>
 
             <label for="select-edad">Unidad de medida </label>
             <select name="select-edad" id="select-edad" required>
                 <option value="">Seleccione</option>
-                <option value="dias">Días</option>
-                <option value="meses">Meses</option>
-                <option value="años">Años</option>
+                <option value="Mes(es)">Mes(es)</option>
+                <option value="Año(s)">Año(s)</option>
             </select><br>
 
             <label for="entrega">Disponibilidad para entrega </label>
             <input type="datetime-local" name="entrega" id="entrega" required><br>
 
             <label for="descripcion">Descripción</label>
-            <textarea name="descripcion" id="descripcion" rows="10" cols="50" required></textarea><br>
+            <textarea name="descripcion" id="descripcion" rows="10" cols="50" required placeholder="Describe a tu mascota: personalidad, características especiales, requisitos para adoptantes, etc."></textarea><br>
 
             <label id="fotos">Foto(s)</label>
             <input type="file" name="foto1" id="foto1" accept="image/*,.pdf">
@@ -107,7 +106,7 @@
             <input type="file" name="foto5" id="foto5" accept="image/*,.pdf" hidden>
         </div>
         
-        <button id="submit-btn" type="submit">Agregar este aviso de adopción</button>
+        <button id="submit-btn" type="button">Agregar este aviso de adopción</button>
     </form>
 </div>
 {% endblock %}

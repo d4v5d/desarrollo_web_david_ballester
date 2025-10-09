@@ -1,53 +1,5 @@
-// Objeto que contiene todas las regiones de Chile como claves,
-// y dentro de cada una un arreglo con sus comunas correspondientes.
-const regiones_comunas = region_comuna
-
-// Listas auxiliares para poblar selects
-const tipo_mascota = ["Gato", "Perro"];
-const medida_edad = ["Año(s)", "Mes(es)"];
-
-/**
- * Función que llena el select de regiones con las claves del objeto regiones_comunas.
- */
-const poblarRegiones = () => {
-    let regionSelect = document.getElementById("select-region");
-    for (const region in regiones_comunas) {
-        let option = document.createElement("option");
-        option.value = region;
-        option.text = region;
-        regionSelect.appendChild(option);
-    }
-};
-
-/**
- * Función genérica que llena un <select> con valores de un arreglo.
- * @param {Array} data - Arreglo con los datos a cargar en el select
- * @param {string} select - ID del select a poblar
- */
-const poblarSelect = (data, select) => {
-    let dataSelect = document.getElementById(select);
-    for (const info in data) {
-        let option = document.createElement("option");
-        option.value = data[info];
-        option.text = data[info];
-        dataSelect.appendChild(option);
-    }
-};
-
-/**
- * Ejemplo de función que obtiene elementos seleccionados de un select múltiple
- * y los muestra en un alert.
- */
-const mostrarSeleccion = () => {
-    const select = document.getElementById("frutas");
-    const seleccionados = Array.from(select.selectedOptions).map(option => option.value);
-    alert("Seleccionaste: " + seleccionados.join(", "));
-};
-
-/**
- * Función que actualiza el select de comunas según la región seleccionada.
- */
-const updateComunas = () => {
+// Función que actualiza el select de comunas según la región seleccionada
+const updateComunas = async () => {
     let regionSelect = document.getElementById("select-region");
     let comunaSelect = document.getElementById("select-comuna");
     let selectedRegion = regionSelect.value;
@@ -55,20 +7,27 @@ const updateComunas = () => {
     // Reinicia el select con la opción por defecto
     comunaSelect.innerHTML = '<option value="">Seleccione una comuna</option>';
     
-    // Si existen comunas para la región seleccionada, se cargan
-    if (regiones_comunas[selectedRegion]) {
-        regiones_comunas[selectedRegion].forEach(comuna => {
-            let option = document.createElement("option");
-            option.value = comuna;
-            option.text = comuna;
-            comunaSelect.appendChild(option);
-        });
+    if (selectedRegion) {
+        try {
+            // Hacer petición AJAX a la API de Flask
+            const response = await fetch(`/api/comunas/${selectedRegion}`);
+            const data = await response.json();
+            
+            // Cargar comunas en el select
+            data.comunas.forEach(comuna => {
+                let option = document.createElement("option");
+                option.value = comuna.id;
+                option.text = comuna.nombre;
+                comunaSelect.appendChild(option);
+            });
+        } catch (error) {
+            console.error('Error al cargar comunas:', error);
+        }
     }
 };
 
 /**
  * Función que actualiza dinámicamente inputs de contacto según las opciones seleccionadas.
- * Cada contacto requiere un input de texto para ingresar datos.
  */
 function changeContactos() {
     const select = document.getElementById("select-contacto");
@@ -77,9 +36,10 @@ function changeContactos() {
     
     if (selected.length === 0) {
         inputsContacto.innerHTML = "";
+        return;
     }
 
-    if (selected.length <= 5) { // Se limita a un máximo de 5 contactos
+    if (selected.length <= 5) {
         inputsContacto.innerHTML = "";
         selected.forEach(option => {
             const label = document.createElement("label");
@@ -92,6 +52,7 @@ function changeContactos() {
             input.maxLength = "50";
             input.name = `contacto-${option.value}`;
             input.required = true;
+            input.placeholder = `Ingresa tu ${option.value}`;
 
             const div = document.createElement("div");
             div.appendChild(label);
@@ -115,33 +76,27 @@ const foto5 = document.getElementById("foto5");
 function mostrarSiguienteInput(actual, siguiente) {
     actual.addEventListener('change', () => {
         if (actual.files.length > 0) {
-            siguiente.hidden = false; // Muestra el siguiente input
+            siguiente.hidden = false;
         }
     });
 }
+
 mostrarSiguienteInput(foto1, foto2);
 mostrarSiguienteInput(foto2, foto3);
 mostrarSiguienteInput(foto3, foto4);
 mostrarSiguienteInput(foto4, foto5);
 
-// Configuración de fecha por defecto: se muestra la hora actual menos 1 hora
+// Configuración de fecha por defecto
 let fechaAMostrar = new Date();
-fechaAMostrar.setHours(fechaAMostrar.getHours() - 1);
+fechaAMostrar.setHours(fechaAMostrar.getHours() + 1);
 const formattedDate = fechaAMostrar.toISOString().slice(0, 16);
 document.getElementById("entrega").value = formattedDate;
 
-// Listeners que conectan selects con funciones dinámicas
+// Listeners
 document.getElementById("select-region").addEventListener("change", updateComunas);
 document.getElementById("select-contacto").addEventListener("change", changeContactos);
 
-/**
- * Función que se ejecuta al cargar la página.
- * Pone en funcionamiento los selects de tipo de mascota, medida de edad y regiones,
- * además de inicializar los inputs de contacto.
- */
+// Inicializar al cargar la página
 window.onload = () => {
-    poblarSelect(tipo_mascota, "select-tipo");
-    poblarSelect(medida_edad, "select-edad");
-    poblarRegiones();
     changeContactos();
 };
