@@ -63,7 +63,7 @@ def crear_aviso():
         fotos_list = []
         for i in range(1, 6):
             foto = request.files.get(f'foto{i}')
-            if foto and foto.filename and validate_file(foto):
+            if foto and foto.filename:
                 # Generar nombre único con hash
                 _filename = hashlib.sha256(
                     (secure_filename(foto.filename) + str(datetime.now().timestamp()))
