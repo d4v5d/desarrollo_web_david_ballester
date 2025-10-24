@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block title %}Estadísticas de Adopción{% endblock %}
+
+{% block content %}
+<div class="main-container">
+    <h1>Estadísticas de Avisos de Adopción</h1>
+
+    <div class="grafico1">
+        <h2>Tendencia de Avisos por Día</h2>
+        <canvas id="chart-linea"></canvas>
+    </div>
+
+    <hr>
+    
+    <div class="grafico2">
+        <h2>Total de Avisos por Tipo de Mascota</h2>
+        <canvas id="chart-torta" style="max-height: 400px;"></canvas>
+    </div>
+
+    <hr>
+    
+    <div class="grafico3">
+        <h2>Avisos de Perros vs Gatos por Mes</h2>
+        <canvas id="chart-barras"></canvas>
+    </div>
+    
+    <div style="margin-top: 20px;">
+        <a href="{{ url_for('index') }}" class="button-link">Volver a la Portada</a>
+    </div>
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="{{ url_for('static', filename='JS/estadisticas.js') }}"></script>
+{% endblock %}

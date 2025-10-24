@@ -1,4 +1,3 @@
 # desarrollo_web_david_ballester
 
-Documente con ChatGPT para mejor orden y estructura.
-Parece que trabajé en la rama main mas que en la rama de "Tarea-1" y no quiero que explote así que por favor revisar esta. Está medio enredada la cosa.
+Para esta tarea probé varias cosas, sobre todo con try y exception igual me complicó más de lo necesario pero valió la pena para testear y esas cosas. En particular refiriendome a la estructura del proyecto deje las imágenes estáticas en uploads (incluso las de la tarea 1). Agregué paginación. Estoy teniendo muchos problemas con el repositorio y no pudé corregir el mensaje final (estuve revisando y no entiendo por qué me falla el redirect), una vez terminas de crear el aviso de adopción no funciona la parte final, lo cual no me permite comprobar si al momento de crear un nuevo aviso se añade efectivamente a la base de datos.
