@@ -1,6 +1,7 @@
 from sqlalchemy import create_engine, Column, Integer, String, DateTime, Text, Enum, ForeignKey
 from sqlalchemy.orm import sessionmaker, declarative_base, relationship
 from datetime import datetime
+from sqlalchemy import func, extract, desc, case
 
 # Configuración de la base de datos
 DB_NAME = "tarea2"
@@ -81,6 +82,19 @@ class ContactarPor(Base):
     
     aviso = relationship("AvisoAdopcion", back_populates="contactos")
 
+class Comentario(Base):
+    __tablename__ = 'comentario'
+    
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    nombre = Column(String(80), nullable=False)
+    texto = Column(String(300), nullable=False)
+    fecha = Column(DateTime, nullable=False, default=datetime.now)
+    aviso_id = Column(Integer, ForeignKey('aviso_adopcion.id'), nullable=False)
+    
+    aviso = relationship("AvisoAdopcion", back_populates="comentarios")
+
+    # Actualizar el modelo AvisoAdopcion para incluir la relación 'comentarios'
+AvisoAdopcion.comentarios = relationship("Comentario", back_populates="aviso", cascade="all, delete-orphan")
 
 # --- Funciones de Base de Datos ---
 
@@ -360,3 +374,96 @@ def get_aviso_by_id(aviso_id):
     
     session.close()
     return result
+
+def create_comentario(nombre, texto, aviso_id):
+    """Inserta un nuevo comentario en la base de datos."""
+    session = SessionLocal()
+    try:
+        nuevo_comentario = Comentario(
+            nombre=nombre,
+            texto=texto,
+            aviso_id=aviso_id,
+            fecha=datetime.now()
+        )
+        session.add(nuevo_comentario)
+        session.commit()
+        return True, None
+    except Exception as e:
+        session.rollback()
+        return False, str(e)
+    finally:
+        session.close()
+
+
+def get_comentarios_by_aviso(aviso_id):
+    """Obtiene todos los comentarios para un aviso específico, ordenados por fecha."""
+    session = SessionLocal()
+    try:
+        comentarios = session.query(Comentario).filter_by(aviso_id=aviso_id).order_by(Comentario.fecha.asc()).all()
+        result = [{
+            'id': c.id,
+            'nombre': c.nombre,
+            'texto': c.texto,
+            'fecha': c.fecha
+        } for c in comentarios]
+        return result
+    finally:
+        session.close()
+
+def get_stats_by_day():
+    """Gráfico de Líneas: Cantidad de avisos de adopción por día."""
+    session = SessionLocal()
+    try:
+        # Agrupa por la fecha de ingreso (solo el día) y cuenta
+        stats = session.query(
+            func.date(AvisoAdopcion.fecha_ingreso).label('dia'),
+            func.sum(AvisoAdopcion.cantidad).label('count') # Suma la cantidad, no solo el aviso
+        ).group_by('dia').order_by('dia').all()
+        
+        # Formato de salida: [{'dia': 'YYYY-MM-DD', 'count': N}]
+        return [{'dia': row.dia.strftime('%Y-%m-%d'), 'count': row.count} for row in stats]
+    finally:
+        session.close()
+
+
+def get_stats_by_type():
+    """Gráfico de Torta: Total de avisos de adopción por tipo (perro/gato)."""
+    session = SessionLocal()
+    try:
+        # Agrupa por tipo y suma la cantidad de mascotas
+        stats = session.query(
+            AvisoAdopcion.tipo,
+            func.sum(AvisoAdopcion.cantidad).label('total')
+        ).group_by(AvisoAdopcion.tipo).all()
+        
+        # Formato de salida: [{'tipo': 'gato', 'total': N}, ...]
+        return [{'tipo': row.tipo, 'total': row.total} for row in stats]
+    finally:
+        session.close()
+
+
+def get_stats_by_month_and_type():
+    """Gráfico de Barras: Cantidad de perros vs gatos por mes."""
+    session = SessionLocal()
+    try:
+        # Agrupa por año y mes
+        stats = session.query(
+            extract('year', AvisoAdopcion.fecha_ingreso).label('year'),
+            extract('month', AvisoAdopcion.fecha_ingreso).label('month'),
+            func.sum(case((AvisoAdopcion.tipo == 'perro', AvisoAdopcion.cantidad), else_=0)).label('perros'),
+            func.sum(case((AvisoAdopcion.tipo == 'gato', AvisoAdopcion.cantidad), else_=0)).label('gatos')
+        ).group_by('year', 'month').order_by('year', 'month').all()
+
+        # Formato de salida: [{'month_label': 'YYYY-MM', 'perros': N, 'gatos': M}, ...]
+        result = []
+        for row in stats:
+            # Crea una etiqueta de mes legible (ej: 2025-10)
+            month_label = f"{int(row.year)}-{int(row.month):02d}"
+            result.append({
+                'month_label': month_label,
+                'perros': row.perros,
+                'gatos': row.gatos
+            })
+        return result
+    finally:
+        session.close()

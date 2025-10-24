@@ -125,14 +125,17 @@ def listado():
 
 @app.route("/detalles/<int:id>")
 def detalles(id):
-    """Detalles de un aviso específico"""
+    """Detalles de un aviso específico y sus comentarios asociados."""
     aviso = db.get_aviso_by_id(id)
     
     if not aviso:
         flash('Aviso no encontrado', 'error')
         return redirect(url_for('listado'))
     
-    return render_template('detalles_listado.html', aviso=aviso)
+    # Obtener comentarios para el listado inicial
+    comentarios = db.get_comentarios_by_aviso(id)
+    
+    return render_template('detalles_listado.html', aviso=aviso, comentarios=comentarios)
 
 
 @app.route("/estadisticas")
@@ -146,6 +149,55 @@ def mensaje_final():
     """Mensaje de confirmación después de crear aviso"""
     return render_template('mensaje_final.html')
 
+
+# Nueva ruta API para agregar comentarios
+@app.route('/api/comentarios', methods=['POST'])
+def api_create_comentario():
+    """Recibe y valida datos del comentario, luego inserta en DB."""
+    try:
+        data = request.get_json()
+        nombre = data.get('nombre', '').strip()
+        texto = data.get('texto', '').strip()
+        aviso_id = data.get('aviso_id')
+        
+        # 1. Validación del lado del servidor (Requerida en Tarea 3) [cite: 21]
+        errors = []
+        if not (3 <= len(nombre) <= 80):
+            errors.append('El nombre debe tener entre 3 y 80 caracteres.')
+        if not (len(texto) >= 5 and len(texto) <= 300):
+            errors.append('El comentario debe tener entre 5 y 300 caracteres.')
+        if not aviso_id:
+            errors.append('ID de aviso es requerido.')
+        
+        if errors:
+            return jsonify({'success': False, 'errors': errors}), 400
+        
+        # 2. Inserción en la base de datos
+        success, error = db.create_comentario(nombre, texto, aviso_id) 
+        
+        if success:
+            # Retorna el nuevo comentario o un mensaje de éxito
+            return jsonify({'success': True, 'message': 'Comentario agregado.'}), 201
+        else:
+            return jsonify({'success': False, 'message': f'Error DB: {error}'}), 500
+
+    except Exception as e:
+        # Manejo de errores de JSON o servidor
+        return jsonify({'success': False, 'message': 'Error interno del servidor.'}), 500
+
+
+@app.route('/api/estadisticas')
+def api_estadisticas():
+    """API endpoint para obtener datos dinámicos de los 3 gráficos."""
+    try:
+        data = {
+            'by_day': db.get_stats_by_day(),
+            'by_type': db.get_stats_by_type(),
+            'by_month_and_type': db.get_stats_by_month_and_type()
+        }
+        return jsonify(data)
+    except Exception as e:
+        return jsonify({'error': 'Error al obtener estadísticas', 'details': str(e)}), 500
 
 if __name__ == "__main__":
     app.run(debug=True)

@@ -184,7 +184,7 @@ const validateForm = () => {
         submitButton.innerText = "Enviar";
         submitButton.style.marginRight = "10px";
         submitButton.addEventListener("click", () => {
-            window.location.href = "/HTML/mensaje_final.html";
+            myForm.submit();
         });
 
         // Botón para volver

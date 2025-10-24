@@ -69,9 +69,44 @@
     <button id="info-portada">
         Volver a la portada
     </button>
-</div>
+
+    <hr>
+    
+    <h2>Comentarios ({{ comentarios | length }})</h2>
+    <div id="comentarios-listado">
+        {% for c in comentarios %}
+        <div class="comentario">
+            <p><strong>{{ c.nombre }}</strong> - <small>{{ c.fecha.strftime('%d-%m-%Y %H:%M') }}</small></p>
+            <p>{{ c.texto }}</p>
+        </div>
+        {% else %}
+        <p>Aún no hay comentarios.</p>
+        {% endfor %}
+    </div>
+
+    <hr>
+
+    <h2>Agregar un Comentario</h2>
+    <div id="comentario-form-container">
+        <form id="form-comentario">
+            <input type="hidden" name="aviso_id" value="{{ aviso.id }}">
+
+            <label for="nombre-comentario">Nombre</label>
+            <input type="text" name="nombre" id="nombre-comentario" minlength="3" maxlength="80" required>
+            
+            <label for="texto-comentario">Comentario</label>
+            <textarea name="texto" id="texto-comentario" rows="4" cols="50" minlength="5" required></textarea>
+            
+            <button type="submit">Agregar comentario</button>
+            
+            <div id="comentario-flash-messages"></div>
+        </form>
+    </div>
+    
+    </div>
 {% endblock %}
 
 {% block scripts %}
-<script src="{{ url_for('static', filename='JS/detalles_listado.js') }}"></script>
-{% endblock %}
+    <script src="{{ url_for('static', filename='JS/detalles_listado.js') }}"></script>
+    <script src="{{ url_for('static', filename='JS/comentarios.js') }}"></script>
+    {% endblock %}
