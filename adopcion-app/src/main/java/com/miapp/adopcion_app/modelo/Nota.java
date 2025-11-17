@@ -13,12 +13,9 @@ public class Nota {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    // Relación ManyToOne: Muchas notas a un AvisoAdopcion
-    @ManyToOne 
+    
     @JoinColumn(name = "aviso_id", nullable = false)
-    private AvisoAdopcion aviso; // Asumiendo que esta Entidad existe y tiene la PK
-
-    @NotNull
+    private AvisoAdopcion aviso; 
     @Min(value = 1, message = "La nota debe ser 1 o mayor.")
     @Max(value = 7, message = "La nota debe ser 7 o menor.")
     @Column(name = "nota", nullable = false)
