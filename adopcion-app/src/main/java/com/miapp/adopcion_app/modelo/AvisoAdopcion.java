@@ -27,7 +27,7 @@ public class AvisoAdopcion {
     @OneToMany(mappedBy = "aviso", fetch = FetchType.LAZY)
     private List<Nota> notas;
 
-    // Campo transitorio: No es una columna en la base de datos.
+    
     // Se usará para mostrar el promedio en la vista HTML.
     @Transient 
     private String notaPromedio; 
@@ -48,5 +48,4 @@ public class AvisoAdopcion {
 
     public String getNotaPromedio() { return notaPromedio; }
     public void setNotaPromedio(String notaPromedio) { this.notaPromedio = notaPromedio; }
-    // Puedes omitir getters/setters para 'notas' si solo se usan en el servicio
 }
