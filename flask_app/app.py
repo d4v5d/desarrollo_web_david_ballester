@@ -2,6 +2,7 @@ from flask import Flask, request, render_template, redirect, url_for, flash, jso
 from werkzeug.utils import secure_filename
 from utils.validations import validate_aviso_form
 import database.db as db
+from database.db import AvisoAdopcion, Nota, Session
 import hashlib
 import filetype
 import os
@@ -116,11 +117,39 @@ def api_get_comunas(region_id):
 
 
 @app.route("/listado")
+@app.route("/listado")
 def listado():
-    """Listado de avisos de adopción con paginación (5 por página)"""
+    """Listado de avisos de adopción con paginación (5 por página) y evaluación."""
     page = request.args.get('page', 1, type=int)
-    data = db.get_avisos_paginados(page=page, per_page=5)
-    return render_template('listado.html', **data)
+    
+    # 1. Obtener datos paginados (resultado del dict original)
+    data = db.get_avisos_paginados(page=page, per_page=5) 
+    
+    session = Session()
+    try:
+        # 2. Obtener los IDs de los avisos de la página actual
+        aviso_ids = [a['id'] for a in data['avisos']]
+        # 3. Consultar los objetos SQLAlchemy correspondientes (para usar la propiedad hybrid_property)
+        avisos_obj = session.query(AvisoAdopcion).filter(AvisoAdopcion.id.in_(aviso_ids)).all()
+        
+        # 4. Mapear y adjuntar el promedio de nota a cada aviso
+        for aviso_obj in avisos_obj:
+            promedio = aviso_obj.nota_promedio 
+            promedio_str = str(promedio) if promedio is not None else '-'
+            
+            # Buscar el diccionario original en 'data['avisos']' y adjuntarle la nota promedio
+            original_aviso = next(item for item in data['avisos'] if item['id'] == aviso_obj.id)
+            original_aviso['nota_promedio'] = promedio_str
+            
+        # data['avisos'] ahora tiene la clave 'nota_promedio'
+        
+        return render_template('listado.html', **data)
+    except Exception as e:
+        flash(f'Error al cargar listado con evaluación: {e}', 'error')
+        # Si falla, se intenta renderizar sin el promedio (o redirigir)
+        return render_template('listado.html', **data) 
+    finally:
+        session.close()
 
 
 @app.route("/detalles/<int:id>")
@@ -198,6 +227,48 @@ def api_estadisticas():
         return jsonify(data)
     except Exception as e:
         return jsonify({'error': 'Error al obtener estadísticas', 'details': str(e)}), 500
+
+@app.route('/api/notas/evaluar', methods=['POST'])
+def api_evaluar_aviso():
+    """Recibe la nota de 1 a 7 asíncronamente, la guarda y devuelve el nuevo promedio."""
+    session = Session()
+    try:
+        data = request.get_json()
+        aviso_id = data.get('aviso_id')
+        nota_valor = data.get('nota')
+        
+        # 1. Validación del lado del servidor (entero entre 1 y 7)
+        if not (isinstance(nota_valor, int) and 1 <= nota_valor <= 7):
+            return jsonify({'success': False, 'message': 'La nota debe ser un número entero entre 1 y 7.'}), 400
+
+        aviso = session.query(AvisoAdopcion).get(aviso_id)
+        if not aviso:
+            return jsonify({'success': False, 'message': 'Aviso de adopción no encontrado.'}), 404
+
+        # 2. Guardar la Nota
+        nueva_nota = Nota(aviso_id=aviso_id, nota=nota_valor)
+        session.add(nueva_nota)
+        session.commit()
+
+        # 3. Recalcular Promedio
+        # Accedemos al promedio usando la propiedad híbrida que ya actualizó la BD.
+        nuevo_promedio = aviso.nota_promedio
+        
+        # Formato de salida para JS (redondeado a un decimal)
+        promedio_str = str(nuevo_promedio) if nuevo_promedio is not None else '-'
+
+        # 4. Devolver respuesta JSON
+        return jsonify({
+            'success': True,
+            'nuevo_promedio': promedio_str
+        }), 200
+
+    except Exception as e:
+        session.rollback()
+        print(f"Error al evaluar: {e}")
+        return jsonify({'success': False, 'message': 'Error interno del servidor al guardar la nota.'}), 500
+    finally:
+        session.close()
 
 if __name__ == "__main__":
     app.run(debug=True)

@@ -2,6 +2,7 @@ from sqlalchemy import create_engine, Column, Integer, String, DateTime, Text, E
 from sqlalchemy.orm import sessionmaker, declarative_base, relationship
 from datetime import datetime
 from sqlalchemy import func, extract, desc, case
+from sqlalchemy.ext.hybrid import hybrid_property
 
 # Configuración de la base de datos
 DB_NAME = "tarea2"
@@ -59,7 +60,18 @@ class AvisoAdopcion(Base):
     comuna = relationship("Comuna", back_populates="avisos")
     fotos = relationship("Foto", back_populates="aviso", cascade="all, delete-orphan")
     contactos = relationship("ContactarPor", back_populates="aviso", cascade="all, delete-orphan")
-
+    # Relación con las notas: un aviso tiene muchas notas
+    notas = relationship("Nota", backref="aviso_adopcion", lazy='dynamic')
+    
+    # Propiedad Híbrida para calcular el promedio de notas
+    @hybrid_property
+    def nota_promedio(self):
+        # Calcula el promedio de las notas o None si no hay
+        promedio = self.session.query(func.avg(Nota.nota)).filter(Nota.aviso_id == self.id).scalar()
+        if promedio is not None:
+            # Redondeamos a un decimal para presentación
+            return round(promedio, 1)
+        return None
 
 class Foto(Base):
     __tablename__ = 'foto'
@@ -95,6 +107,16 @@ class Comentario(Base):
 
     # Actualizar el modelo AvisoAdopcion para incluir la relación 'comentarios'
 AvisoAdopcion.comentarios = relationship("Comentario", back_populates="aviso", cascade="all, delete-orphan")
+
+# --- CLASE NOTA (NUEVA) ---
+class Nota(Base):
+    __tablename__ = 'nota'
+    id = Column(Integer, primary_key=True)
+    aviso_id = Column(Integer, ForeignKey('aviso_adopcion.id'), nullable=False)
+    nota = Column(Integer, nullable=False) # El valor de 1 a 7
+
+    def __repr__(self):
+        return f"<Nota(id={self.id}, aviso_id={self.aviso_id}, nota={self.nota})>"
 
 # --- Funciones de Base de Datos ---
 

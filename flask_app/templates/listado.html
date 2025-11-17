@@ -18,6 +18,7 @@
                 <th>Cantidad tipo <br>Edad</th>
                 <th>Nombre <br> Contacto</th>
                 <th>Total fotos</th>
+                <th>Nota</th>
             </tr>
         </thead>
 
@@ -36,6 +37,18 @@
                          width="320" 
                          height="240"
                          class="clickable-img">
+                </td>
+                <td class="nota-promedio">
+                    {{ aviso['nota_promedio'] }} 
+                </td> 
+                
+                <td>
+                    <a href="#" 
+                       class="btn-evaluar" 
+                       data-aviso-id="{{ aviso['id'] }}" 
+                       onclick="event.stopPropagation(); mostrarSelectorNota(this, event);">
+                       evaluar
+                    </a>
                 </td>
             </tr>
             {% endfor %}
