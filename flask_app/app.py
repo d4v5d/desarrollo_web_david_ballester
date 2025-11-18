@@ -2,7 +2,7 @@ from flask import Flask, request, render_template, redirect, url_for, flash, jso
 from werkzeug.utils import secure_filename
 from utils.validations import validate_aviso_form
 import database.db as db
-from database.db import AvisoAdopcion, Nota, Session
+from database.db import AvisoAdopcion, Nota, SessionLocal
 import hashlib
 import filetype
 import os
@@ -125,7 +125,7 @@ def listado():
     # 1. Obtener datos paginados (resultado del dict original)
     data = db.get_avisos_paginados(page=page, per_page=5) 
     
-    session = Session()
+    session = SessionLocal()
     try:
         # 2. Obtener los IDs de los avisos de la página actual
         aviso_ids = [a['id'] for a in data['avisos']]
@@ -231,7 +231,7 @@ def api_estadisticas():
 @app.route('/api/notas/evaluar', methods=['POST'])
 def api_evaluar_aviso():
     """Recibe la nota de 1 a 7 asíncronamente, la guarda y devuelve el nuevo promedio."""
-    session = Session()
+    session = SessionLocal()
     try:
         data = request.get_json()
         aviso_id = data.get('aviso_id')

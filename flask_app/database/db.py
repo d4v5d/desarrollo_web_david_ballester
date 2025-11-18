@@ -3,6 +3,7 @@ from sqlalchemy.orm import sessionmaker, declarative_base, relationship
 from datetime import datetime
 from sqlalchemy import func, extract, desc, case
 from sqlalchemy.ext.hybrid import hybrid_property
+from sqlalchemy.orm import object_session
 
 # Configuración de la base de datos
 DB_NAME = "tarea2"
@@ -63,15 +64,30 @@ class AvisoAdopcion(Base):
     # Relación con las notas: un aviso tiene muchas notas
     notas = relationship("Nota", backref="aviso_adopcion", lazy='dynamic')
     
-    # Propiedad Híbrida para calcular el promedio de notas
     @hybrid_property
     def nota_promedio(self):
-        # Calcula el promedio de las notas o None si no hay
-        promedio = self.session.query(func.avg(Nota.nota)).filter(Nota.aviso_id == self.id).scalar()
+        # 1. Obtenemos la sesión a la que está ligada esta instancia
+        session = object_session(self)
+        if session is None:
+            # Si no está ligada a una sesión (ej. cargado sin session), no podemos consultar
+            # En tu app.py, lo cargas con .all(), por lo que debería funcionar.
+            return None 
+
+        # 2. Consulta el promedio directamente usando la sesión y el ID
+        promedio = session.query(func.avg(Nota.nota)).filter(Nota.aviso_id == self.id).scalar()
+        
         if promedio is not None:
-            # Redondeamos a un decimal para presentación
             return round(promedio, 1)
         return None
+    
+    @nota_promedio.expression
+    def nota_promedio(cls):
+        # Esta es la parte que permite que SQLAlchemy lo use en consultas grandes (joins)
+        return (
+            session.query(func.avg(Nota.nota))
+            .filter(Nota.aviso_id == cls.id)
+            .label("promedio_nota")
+        )
 
 class Foto(Base):
     __tablename__ = 'foto'

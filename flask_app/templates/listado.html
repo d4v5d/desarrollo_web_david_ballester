@@ -18,13 +18,15 @@
                 <th>Cantidad tipo <br>Edad</th>
                 <th>Nombre <br> Contacto</th>
                 <th>Total fotos</th>
-                <th>Nota</th>
+                <th>nota</th>
+                <th></th> 
             </tr>
         </thead>
 
         <tbody>
             {% for aviso in avisos %}
-            <<tr onclick="window.location.href='{{ url_for("detalles", id=aviso['id']) }}'">
+                        <tr data-aviso-id="{{ aviso['id'] }}" 
+                onclick="window.location.href='{{ url_for('detalles', id=aviso['id']) }}'">
                 <td>{{ aviso['fecha_publicacion']|safe }}</td>
                 <td>{{ aviso['fecha_entrega_formato']|safe }}</td>
                 <td>{{ aviso['comuna'] }}</td>
@@ -56,7 +58,6 @@
     </table>    
 </div>
 
-<!-- Controles de paginación -->
 <div class="paginacion">
     {% if has_prev %}
         <a href="{{ url_for('listado', page=current_page-1) }}" class="page-btn">← Anterior</a>
@@ -83,8 +84,16 @@
     <span class="close">&times;</span>
     <img class="modal-content" id="modalImg">
 </div>
+
+<div id="selector-nota" style="display:none; position:absolute; z-index:100; border: 1px solid #ccc; padding: 10px; background: white; box-shadow: 2px 2px 5px rgba(0,0,0,0.2);">
+    <p>Selecciona una nota (1-7):</p>
+    <div id="opciones-nota">
+        </div>
+</div>
+
 {% endblock %}
 
 {% block scripts %}
 <script src="{{ url_for('static', filename='JS/listado.js') }}"></script>
+<script src="{{ url_for('static', filename='JS/evaluacion.js') }}"></script> 
 {% endblock %}
