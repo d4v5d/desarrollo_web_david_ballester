@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block title %}Portada - Portal de Adopciones{% endblock %}
+
+{% block content %}
+<div class="titulo">
+    <h1>¡Pasa a nuestro Portal de Adopciones!</h1>
+</div>
+
+<div class="botones">
+    <button type="button" id="crear_aviso">
+        Crear aviso de adopción
+    </button>
+    <button type="button" id="listado">
+        Listado de adopciones
+    </button>
+    <button type="button" id="estadisticas">
+        Estadísticas
+    </button>
+</div>
+
+<br>
+
+<h2 style="text-align: center;">Últimos avisos: </h2>
+<div class="tabla">
+    <table>
+        <thead>
+            <tr>
+                <th>Fecha de publicación</th>
+                <th>Comuna</th>
+                <th>Sector</th>
+                <th>Cantidad Tipo <br>Edad</th>
+                <th>Foto</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            {% for aviso in ultimos_avisos %}
+            <tr>
+                <td>{{ aviso['fecha_publicacion'] }}</td>
+                <td>{{ aviso['comuna'] }}</td>
+                <td>{{ aviso['sector'] }}</td>
+                <td>{{ aviso['cantidad'] }} {{ aviso['tipo'] }}<br>{{ aviso['edad_formato'] }}</td>
+                <td><img src="{{ url_for('static', filename='uploads/' + aviso['foto']) }}" alt="{{ aviso['tipo'] }}" width="300"></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='JS/portada.js') }}"></script>
+{% endblock %}

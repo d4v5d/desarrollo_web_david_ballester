@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+
+{% block title %}Listado de Adopciones{% endblock %}
+
+{% block content %}
+<div class="titulo">
+    <h1>Listado de adopciones</h1>
+</div>
+
+<div class="tabla" id="tabla-interactiva">
+    <table>
+        <thead>
+            <tr>
+                <th>Fecha<br>Publicación</th>
+                <th>Fecha<br>Entrega</th>
+                <th>Comuna</th>
+                <th>Sector</th>
+                <th>Cantidad tipo <br>Edad</th>
+                <th>Nombre <br> Contacto</th>
+                <th>Total fotos</th>
+                <th>nota</th>
+                <th></th> 
+            </tr>
+        </thead>
+
+        <tbody>
+            {% for aviso in avisos %}
+                        <tr data-aviso-id="{{ aviso['id'] }}" 
+                onclick="window.location.href='{{ url_for('detalles', id=aviso['id']) }}'">
+                <td>{{ aviso['fecha_publicacion']|safe }}</td>
+                <td>{{ aviso['fecha_entrega_formato']|safe }}</td>
+                <td>{{ aviso['comuna'] }}</td>
+                <td>{{ aviso['sector'] }}</td>
+                <td>{{ aviso['cantidad'] }} {{ aviso['tipo'] }}<br> {{ aviso['edad_formato'] }}</td>
+                <td>{{ aviso['nombre_contacto'] }}<br>{{ aviso['contacto_preferido'] }}</td>
+                <td>
+                    <img src="{{ url_for('static', filename='uploads/' + aviso['foto']) }}" 
+                         alt="{{ aviso['tipo'] }}" 
+                         width="320" 
+                         height="240"
+                         class="clickable-img">
+                </td>
+                <td class="nota-promedio">
+                    {{ aviso['nota_promedio'] }} 
+                </td> 
+                
+                <td>
+                    <a href="#" 
+                       class="btn-evaluar" 
+                       data-aviso-id="{{ aviso['id'] }}" 
+                       onclick="event.stopPropagation(); mostrarSelectorNota(this, event);">
+                       evaluar
+                    </a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>    
+</div>
+
+<div class="paginacion">
+    {% if has_prev %}
+        <a href="{{ url_for('listado', page=current_page-1) }}" class="page-btn">← Anterior</a>
+    {% else %}
+        <span class="page-btn disabled">← Anterior</span>
+    {% endif %}
+    
+    <span class="page-info">
+        Página {{ current_page }} de {{ total_pages }} ({{ total }} avisos)
+    </span>
+    
+    {% if has_next %}
+        <a href="{{ url_for('listado', page=current_page+1) }}" class="page-btn">Siguiente →</a>
+    {% else %}
+        <span class="page-btn disabled">Siguiente →</span>
+    {% endif %}
+</div>
+
+<button id="listado-portada">
+    Volver a la portada
+</button>  
+
+<div id="imageModal" class="modal">
+    <span class="close">&times;</span>
+    <img class="modal-content" id="modalImg">
+</div>
+
+<div id="selector-nota" style="display:none; position:absolute; z-index:100; border: 1px solid #ccc; padding: 10px; background: white; box-shadow: 2px 2px 5px rgba(0,0,0,0.2);">
+    <p>Selecciona una nota (1-7):</p>
+    <div id="opciones-nota">
+        </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='JS/listado.js') }}"></script>
+<script src="{{ url_for('static', filename='JS/evaluacion.js') }}"></script> 
+{% endblock %}

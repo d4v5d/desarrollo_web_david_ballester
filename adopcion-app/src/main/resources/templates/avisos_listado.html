@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Listado de Avisos de Adopción</title>
+</head>
+<body>
+
+    <h2> Listado de Avisos de Adopción y Evaluación</h2>
+
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Fecha publicación</th>
+                <th>Sector</th>
+                <th>Cantidad Tipo Edad</th>
+                <th>Comuna</th>
+                <th>Nota</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="aviso : ${avisos}"> 
+                <td th:text="${aviso.id}">1</td>
+                <td th:text="${aviso.fechaPublicacion}">2025-01-01</td>
+                <td th:text="${aviso.sector}">Beauchef 859, terraza</td>
+                <td th:text="${aviso.cantidadTipoEdad}">1 gato 2 meses</td>
+                <td th:text="${aviso.comuna}">Santiago</td>
+                
+                <td class="nota-promedio" th:text="${aviso.notaPromedio}">-</td> 
+                
+                <td>
+                    <a href="#" 
+                       class="btn-evaluar" 
+                       th:data-aviso-id="${aviso.id}" 
+                       onclick="mostrarSelectorNota(this, event)">
+                       evaluar
+                    </a>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div id="selector-nota" style="display:none; position:absolute; z-index:100; border: 1px solid #ccc; padding: 10px; background: white; box-shadow: 2px 2px 5px rgba(0,0,0,0.2);">
+        <p>Selecciona una nota (1-7):</p>
+        <div id="opciones-nota">
+            </div>
+    </div>
+
+    <script src="/js/evaluacion.js"></script>
+    
+</body>
+</html>

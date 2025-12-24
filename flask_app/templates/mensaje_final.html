@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block title %}Aviso Creado - Portal de Adopciones{% endblock %}
+
+{% block content %}
+<div class="main-container">
+    <div id="final-box">
+        <h2 id="final-msg">
+            ¡Hemos recibido la información de adopción, muchas gracias y suerte!
+        </h2>
+        <button id="final-btn">
+            Volver a la Portada
+        </button>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='JS/mensaje_final.js') }}"></script>
+{% endblock %}
